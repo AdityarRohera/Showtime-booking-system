@@ -24,7 +24,7 @@ app.use(cors());
 import UserRoute from './routes/UserRoute.js';
 
 
-app.use('/api/v1/users' , UserRoute);
+app.use('/api/v1/user' , UserRoute);
 
 
 
