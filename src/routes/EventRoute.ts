@@ -9,7 +9,7 @@ const EventRoute = express.Router();
 EventRoute.post('/events' , userAuth , EventController.createEvent);
 
 // APPLY QUERY PARAMETER AND FILTERING
-// EventRoute.get('/events' , userAuth , getAllEventHandler);
+EventRoute.get('/events' , userAuth , EventController.getEvent);
 
 // EventRoute.get('/eventS/:eventId' , userAuth , getFullEventHandler);
 

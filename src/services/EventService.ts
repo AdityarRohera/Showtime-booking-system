@@ -125,3 +125,21 @@ export const createEventService = async (
         client.release();
     }
 };
+
+
+// services/event.service.ts
+
+export const getAllEventsService = async (filters: any) => {
+
+    const {page,limit} = filters;
+
+    const offset = (page - 1) * limit;
+
+    const response =
+        await Events.getAllEventsQuery({
+            ...filters,
+            offset
+        });
+
+    return response.rows;
+};
