@@ -2,7 +2,8 @@
 
 import type { Request , Response } from 'express';
 import * as UserService from '../services/UserService.js';
-const secret = process.env.TOKEN_SECRET;
+
+import type { AuthenticatedRequest } from '../middlewares/auth.js';
 
 
 export const signup = async(req : Request , res : Response) => {
@@ -134,3 +135,42 @@ export const login = async (
     }
 };
 
+
+// GET USER PROFILE
+export const userProfile = async (req: Request,res: Response) => {
+
+    console.log("-------------Inside Getting user Profile --------------");
+    const userId = (req as AuthenticatedRequest).user.userId;
+
+    try {
+
+        return res.status(200).json({
+            success : true,
+            message : "Fetched User Info successfully",
+            user : userId
+        })
+
+    } catch (err: unknown) {
+
+        console.log("Error comes in getting userInfo", err);
+
+        let errorMessage;
+
+        if (err instanceof Error) {
+
+            errorMessage = err.message;
+
+         } else if (typeof err === "string") {
+            errorMessage = err;
+
+        } else {
+            errorMessage = "Unknown Error";
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server Error",
+            error: errorMessage
+        });
+    }
+};

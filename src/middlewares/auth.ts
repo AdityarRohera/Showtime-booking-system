@@ -15,7 +15,7 @@ export const userAuth = (req : Request , res : Response , next : Function) => {
 
             const userReq = req as AuthenticatedRequest;
             const {token} = req.headers;
-            console.log("Inside user auth -> " , token , typeof(token))
+            console.log("Inside user auth -> " , token)
 
             if(!token || typeof token!== "string"){
                 return res.status(400).json({

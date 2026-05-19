@@ -2,6 +2,13 @@
 import { pool } from "../config/dbConfig.js";
 import bcrypt from "bcrypt";
 import * as User  from "../queries/UserQuery.js";
+import dotenv from 'dotenv'
+import jwt from 'jsonwebtoken'
+
+
+// Global variable
+dotenv.config();
+const secret = process.env.TOKEN_SECRET;
 
 interface SignupPayload {
     name: string;
@@ -57,7 +64,7 @@ export const signupService = async ({
 
         return {
             user: user.rows[0],
-            userProfile: userProfile.rows[0]
+            userProfile: userProfile.rows[0],
         };
 
     } catch (err) {
@@ -74,7 +81,8 @@ export const signupService = async ({
 
 export const loginService = async ({
     email,
-    password
+    password,
+    
 }: LoginPayload) => {
 
     // FIND USER
@@ -98,7 +106,14 @@ export const loginService = async ({
         throw new Error("Incorrect password");
     }
 
+    // CREATE TOKEN
+        const token = jwt.sign(
+            {
+                userId : user.rows[0].USER_ID
+            }, secret!
+        )
+
     // REMOVE PASSWORD
     delete existingUser.PASSWORD;
-    return existingUser;
+    return {existingUser , token};
 };

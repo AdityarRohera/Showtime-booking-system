@@ -22,9 +22,10 @@ app.use(cors());
 
 // import routes here
 import UserRoute from './routes/UserRoute.js';
-
+import EventRoute from './routes/EventRoute.js';
 
 app.use('/api/v1/user' , UserRoute);
+app.use('/api/v1' ,EventRoute);
 
 
 
