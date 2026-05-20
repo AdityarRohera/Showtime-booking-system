@@ -24,10 +24,12 @@ app.use(cors());
 import UserRoute from './routes/UserRoute.js';
 import EventRoute from './routes/EventRoute.js';
 import ShowsRoute from './routes/ShowsRoute.js';
+import VenueRoute from './routes/VenueRoute.js';
 
 app.use('/api/v1/user' , UserRoute);
 app.use('/api/v1' ,EventRoute);
 app.use('/api/v1' , ShowsRoute);
+app.use('/api/v1' , VenueRoute);
 
 
 
