@@ -143,3 +143,166 @@ export const getAllEventsService = async (filters: any) => {
 
     return response.rows;
 };
+
+
+
+export const getSingleEventService = async (
+    eventId: string
+) => {
+
+    const event =
+        await Events.getSingleEventQuery(
+            eventId
+        );
+
+    if (event.rows.length === 0) {
+        throw new Error("Event not found");
+    }
+
+    return event.rows[0];
+};
+
+
+
+
+
+// services/event.service.ts
+
+export const updateEventService = async (
+    data: any
+) => {
+
+    const client = await pool.connect();
+
+    try {
+
+        const {
+            eventId,
+            castIds,
+            genresIds
+        } = data;
+
+        // CHECK EVENT EXISTS
+
+        const existingEvent =
+            await Events.getSingleEventQuery(
+                eventId
+            );
+
+        if (
+            existingEvent.rows.length === 0
+        ) {
+            throw new Error("Event not found");
+        }
+
+        // DUPLICATE CAST IDS
+
+        const uniqueCastIds =
+            new Set(castIds);
+
+        if (
+            uniqueCastIds.size !==
+            castIds.length
+        ) {
+            throw new Error(
+                "Duplicate castIds are not allowed"
+            );
+        }
+
+        // DUPLICATE GENRE IDS
+
+        const uniqueGenreIds =
+            new Set(genresIds);
+
+        if (
+            uniqueGenreIds.size !==
+            genresIds.length
+        ) {
+            throw new Error(
+                "Duplicate genresIds are not allowed"
+            );
+        }
+
+        // VALIDATE CAST IDS
+
+        const castData =
+            await Cast.getCastsByIds(castIds);
+
+        if (
+            castData.rowCount !==
+            uniqueCastIds.size
+        ) {
+            throw new Error("Invalid CastIds");
+        }
+
+        // VALIDATE GENRE IDS
+
+        const genreData =
+            await Genre.getGenresIds(genresIds);
+
+        if (
+            genreData.rowCount !==
+            uniqueGenreIds.size
+        ) {
+            throw new Error("Invalid GenreIds");
+        }
+
+        // START TRANSACTION
+
+        await client.query("BEGIN");
+
+        // UPDATE EVENT
+
+        const updatedEvent =
+            await Events.updateEventQuery(
+                client,
+                data
+            );
+
+        // DELETE OLD GENRES
+
+        await Genre.deleteEventGenresQuery(
+            client,
+            eventId
+        );
+
+        // CREATE NEW GENRES
+
+        await Genre.createBulkGenresQuery(
+            client,
+            eventId,
+            genresIds
+        );
+
+        // DELETE OLD CASTS
+
+        await Cast.deleteEventCastQuery(
+            client,
+            eventId
+        );
+
+        // CREATE NEW CASTS
+
+        await Cast.createBulkCastQuery(
+            client,
+            eventId,
+            castIds
+        );
+
+        // COMMIT
+
+        await client.query("COMMIT");
+
+        return updatedEvent.rows[0];
+
+    } catch (err) {
+
+        await client.query("ROLLBACK");
+
+        throw err;
+
+    } finally {
+
+        client.release();
+    }
+};

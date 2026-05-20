@@ -42,3 +42,20 @@ export const createBulkGenresQuery = (
         [eventId, genreIds]
     );
 };
+
+
+// DELETE GENRES QUERY 
+export const deleteEventGenresQuery = (
+    client: any,
+    eventId: string
+) => {
+
+    return client.query(
+        `
+        DELETE FROM "EVENT_GENRES"
+
+        WHERE "EVENT_ID" = $1
+        `,
+        [eventId]
+    );
+};

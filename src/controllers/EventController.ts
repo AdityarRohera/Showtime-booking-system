@@ -405,3 +405,170 @@ export const getEvent = async (
         });
     }
 };
+
+
+// controllers/event.controller.ts
+
+export const getSingleEvent = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const { eventId } = req.params;
+
+        // VALIDATION
+
+        if (!eventId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Event id is required"
+            });
+        }
+
+        // SERVICE
+
+        const response =
+            await EventServices.getSingleEventService(
+                eventId as string
+            );
+
+        return res.status(200).json({
+            success: true,
+            data: response
+        });
+
+    } catch (err: unknown) {
+
+        console.log(
+            "Error comes in get single event",
+            err
+        );
+
+        if (err instanceof Error) {
+
+            if (
+                err.message ===
+                "Event not found"
+            ) {
+
+                return res.status(404).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+
+// controllers/event.controller.ts
+
+export const updateEvent = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const { eventId } = req.params;
+
+        const {
+            title,
+            description,
+            eventType,
+            duration,
+            releaseDate,
+            thumbnailUrl,
+            bannerUrl,
+            language,
+            status,
+            castIds,
+            genresIds
+        } = req.body;
+
+        // VALIDATION
+
+        if (!eventId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Event id is required"
+            });
+        }
+
+        const data = {
+            eventId,
+            title,
+            description,
+            eventType,
+            duration,
+            releaseDate,
+            thumbnailUrl,
+            bannerUrl,
+            language,
+            status,
+            castIds,
+            genresIds
+        };
+
+        // VALIDATE
+
+        validateCreateEvent(data);
+
+        // SERVICE
+
+        const response =
+            await EventServices.updateEventService(
+                data
+            );
+
+        return res.status(200).json({
+            success: true,
+            message: "Event updated successfully",
+            data: response
+        });
+
+    } catch (err: unknown) {
+
+        console.log(
+            "Error comes in update event",
+            err instanceof Error
+                ? err.message
+                : err
+        );
+
+        if (err instanceof Error) {
+
+            const handledErrors = [
+                "Event not found",
+                "Invalid CastIds",
+                "Invalid GenreIds",
+                "Duplicate castIds are not allowed",
+                "Duplicate genresIds are not allowed"
+            ];
+
+            if (
+                handledErrors.includes(err.message)
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};

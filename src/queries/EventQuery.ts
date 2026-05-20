@@ -122,7 +122,7 @@ export const getAllEventsQuery = async ( filters: any) => {
     if (releaseYear) {
 
         values.push(releaseYear);
-        
+
         query += `
             AND EXTRACT(
                 YEAR FROM "RELEASE_DATE"
@@ -178,5 +178,82 @@ export const getAllEventsQuery = async ( filters: any) => {
     return await pool.query(
         query,
         values
+    );
+};
+
+
+
+// GET SINGLE EVENT
+
+export const getSingleEventQuery = async (
+    eventId: string
+) => {
+
+    return await pool.query(
+        `
+        SELECT *
+        FROM "EVENTS"
+
+        WHERE "EVENT_ID" = $1
+        `,
+        [eventId]
+    );
+};
+
+
+
+
+// UPDATE EVENT QUERY
+
+export const updateEventQuery = (
+    client: any,
+    data: any
+) => {
+
+    const {
+        eventId,
+        title,
+        description,
+        eventType,
+        duration,
+        releaseDate,
+        thumbnailUrl,
+        bannerUrl,
+        language,
+        status
+    } = data;
+
+    return client.query(
+        `
+        UPDATE "EVENTS"
+
+        SET
+            "TITLE" = $1,
+            "DESCRIPTION" = $2,
+            "EVENT_TYPE" = $3,
+            "DURATION" = $4,
+            "RELEASE_DATE" = $5,
+            "THUMBNAIL_URL" = $6,
+            "BANNER_URL" = $7,
+            "LANGUAGE" = $8,
+            "STATUS" = $9,
+            "UPDATED_AT" = CURRENT_TIMESTAMP
+
+        WHERE "EVENT_ID" = $10
+
+        RETURNING *
+        `,
+        [
+            title,
+            description,
+            eventType,
+            duration,
+            releaseDate,
+            thumbnailUrl,
+            bannerUrl,
+            language,
+            status,
+            eventId
+        ]
     );
 };

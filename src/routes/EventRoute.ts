@@ -8,12 +8,11 @@ const EventRoute = express.Router();
 
 EventRoute.post('/events' , userAuth , EventController.createEvent);
 
-// APPLY QUERY PARAMETER AND FILTERING
 EventRoute.get('/events' , userAuth , EventController.getEvent);
 
-// EventRoute.get('/eventS/:eventId' , userAuth , getFullEventHandler);
+EventRoute.get('/events/:eventId' , userAuth , EventController.getSingleEvent);
 
-// EventRoute.put('/events/:eventId' , userAuth , updateEventHandler);
+EventRoute.put('/events/:eventId' , userAuth , EventController.updateEvent);
 
 
 

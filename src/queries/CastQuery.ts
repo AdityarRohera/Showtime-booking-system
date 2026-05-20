@@ -42,3 +42,21 @@ export const createBulkCastQuery = (
         [eventId, castIds]
     );
 };
+
+
+// DELETE CAST QUERY
+
+export const deleteEventCastQuery = (
+    client: any,
+    eventId: string
+) => {
+
+    return client.query(
+        `
+        DELETE FROM "EVENT_CASTS"
+
+        WHERE "EVENT_ID" = $1
+        `,
+        [eventId]
+    );
+};
