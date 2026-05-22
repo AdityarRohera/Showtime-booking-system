@@ -103,3 +103,127 @@ export const checkShowSlotQuery = async ({venueId ,showDate,startTime} : any) =>
         [venueId , showDate , startTime]
     )
 }
+
+
+// GET SINGLE SHOW QUERY
+
+export const getSingleShowQuery =
+(
+    showId: string
+) => {
+
+    return pool.query(
+        `
+        SELECT *
+        FROM "SHOWS"
+
+        WHERE "SHOW_ID" = $1
+        `,
+        [showId]
+    );
+};
+
+
+// GET SHOW SEATS QUERY
+
+export const getShowSeatsQuery =
+(
+    showId: string
+) => {
+
+    return pool.query(
+        `
+        SELECT
+            "SHOW_SEAT_ID",
+            "SEAT_NO",
+            "SEAT_TYPE",
+            "PRICE",
+            "STATUS"
+        FROM "SHOW_SEATS"
+
+        WHERE "SHOW_ID" = $1
+
+        ORDER BY "SEAT_NO" ASC
+        `,
+        [showId]
+    );
+};
+
+
+
+// GET SEATS FOR VALIDATE
+
+// queries/show.query.ts
+
+export const getShowSeatsForValidateQuery =
+(
+    showId: string,
+    seatIds: string[]
+) => {
+
+    return pool.query(
+        `
+        SELECT
+            "SHOW_SEAT_ID",
+            "SEAT_NO",
+            "SEAT_TYPE",
+            "PRICE",
+            "STATUS"
+
+        FROM "SHOW_SEATS"
+
+        WHERE "SHOW_ID" = $1
+
+        AND "SHOW_SEAT_ID"
+        = ANY($2::uuid[])
+
+        AND "STATUS" = 'AVAILABLE'
+        `,
+        [
+            showId,
+            seatIds
+        ]
+    );
+};
+
+
+// queries/show.query.ts
+
+export const updateShowSeatsStatusQuery =
+(
+    client: any,
+    userId: string,
+    showId: string,
+    seatIds: string[]
+) => {
+
+    return client.query(
+        `
+        UPDATE "SHOW_SEATS"
+
+        SET
+            "STATUS" = 'LOCKED',
+
+            "LOCKED_BY_USER_ID" = $1,
+
+            "LOCKED_AT" = NOW(),
+
+            "LOCK_EXPIRY" =
+            NOW() + INTERVAL '5 minutes'
+
+        WHERE "SHOW_ID" = $2
+
+        AND "SHOW_SEAT_ID"
+        = ANY($3::uuid[])
+
+        AND "STATUS" = 'AVAILABLE'
+
+        RETURNING *
+        `,
+        [
+            userId,
+            showId,
+            seatIds
+        ]
+    );
+};

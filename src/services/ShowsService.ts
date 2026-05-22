@@ -99,3 +99,26 @@ export const createShowService = async(data : any) => {
    }
 }
 
+
+export const getShowSeatsService = async (showId: string) => {
+
+    // VALIDATE SHOW
+
+    const show =
+        await Shows.getSingleShowQuery(
+            showId
+        );
+
+    if (show.rows.length === 0) {
+        throw new Error("Show not found");
+    }
+
+    // FETCH SHOW SEATS
+
+    const seats =
+        await Shows.getShowSeatsQuery(
+            showId
+        );
+
+    return seats.rows;
+};

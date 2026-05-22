@@ -3,6 +3,7 @@
 import express from 'express';
 import dotenv from 'dotenv'
 import cors from 'cors'
+import "./cron/BookingExpiry.cron.js"
 import { dbConnection } from './config/dbConfig.js';
 
 
@@ -25,11 +26,13 @@ import UserRoute from './routes/UserRoute.js';
 import EventRoute from './routes/EventRoute.js';
 import ShowsRoute from './routes/ShowsRoute.js';
 import VenueRoute from './routes/VenueRoute.js';
+import BookingRoute from './routes/BookingRoute.js';
 
 app.use('/api/v1/user' , UserRoute);
 app.use('/api/v1' ,EventRoute);
 app.use('/api/v1' , ShowsRoute);
 app.use('/api/v1' , VenueRoute);
+app.use('/api/v1' , BookingRoute)
 
 
 

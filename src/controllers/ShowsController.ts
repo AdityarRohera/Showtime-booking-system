@@ -63,3 +63,51 @@ export const createShow = async(req : Request , res : Response) => {
 
     }
 }
+
+export const getShowSeats = async (req: Request,res: Response) => {
+
+    try {
+
+        const { showId } = req.params;
+
+        const response =
+            await ShowsServices
+            .getShowSeatsService(showId as string);
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Show seats fetched successfully",
+            data: response
+        });
+
+    } catch (err: unknown) {
+
+        console.log(
+            "Error comes in get show seats",
+            err instanceof Error
+                ? err.message
+                : err
+        );
+
+        if (err instanceof Error) {
+
+            if (
+                err.message ===
+                "Show not found"
+            ) {
+
+                return res.status(404).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+        }
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Internal server error"
+        });
+    }
+};
